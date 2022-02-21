@@ -2,7 +2,7 @@
 A Telegram Bot provides a virtual playground to explore and do some mock trading.
 
 `Features and Use cases`
-- User management -> Handling multiple users, login, signup, forgotpassword / reset-password
+- User management -> Handling single user and groups
 - Listing Available Coins -> List of available coins along with their properties and description such as current price, open-price, close-price, 24Hrs Change, and etc
 - Selective Currency Inspection
 - Creating favourite / watchlist
