@@ -14,3 +14,5 @@ A virtual playground to explore and do some mock trading.
 - https://api2.lunarcrush.com/v2
 - https://developers.cryptoapis.io/technical-documentation/general-information/overview
 - https://messari.io/api
+
+`Tech Stack` -> Python + Flask , Firebase and Telegram Bot Integration 
