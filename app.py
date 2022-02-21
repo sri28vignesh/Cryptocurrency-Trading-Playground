@@ -1,7 +1,7 @@
 from email import message
 from flask import Flask,request,jsonify
 from crypto_trading_bot import bot
-# TOKEN = "5112747288:AAFbhd8HWD2xzIKHY1lAECoCEw0_Tv96cq0"
+
 app = Flask(__name__)
 
 @app.route("/")
