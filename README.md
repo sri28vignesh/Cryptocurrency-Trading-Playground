@@ -16,3 +16,5 @@ A virtual playground to explore and do some mock trading.
 - https://messari.io/api
 
 `Tech Stack` -> Python + Flask , Firebase and Telegram Bot Integration 
+
+`Hosting` -> Heroku
