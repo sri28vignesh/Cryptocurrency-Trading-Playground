@@ -1,5 +1,5 @@
 # Cryptocurrency-Trading-Playground
-A virtual playground to explore and do some mock trading.
+A Telegram Bot provides a virtual playground to explore and do some mock trading.
 
 `Features and Use cases`
 - User management -> Handling multiple users, login, signup, forgotpassword / reset-password
@@ -15,6 +15,6 @@ A virtual playground to explore and do some mock trading.
 - https://developers.cryptoapis.io/technical-documentation/general-information/overview
 - https://messari.io/api
 
-`Tech Stack` -> Python + Flask , Firebase and Telegram Bot Integration 
+`Tech Stack` -> Python + Telegram Bot API
 
 `Hosting` -> Heroku
