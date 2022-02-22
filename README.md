@@ -20,3 +20,14 @@ A Telegram Bot provides a virtual playground to explore and do some mock trading
 `Hosting` -> Heroku
 
 `Telegram Bot Link` ->  [Crypto-Trading-Playground](https://t.me/Crypto_trading_plaground_bot)
+
+## Telegram Bot Commands
+**Commands**                 **Description**
+- /available_cryptos  ->   Provides the list of available cryptocoins
+/wallet_balance     ->   Displays the available wallet balance
+/watchlist          ->   Provides info of watchlisted coins
+/add_watchlist      ->   Helps to create and add coins to watchlist
+/myassets           ->   Provides the list of current holdings
+/open_trade         ->   Initiates a trade on selected coin
+/close_trade        ->   Stops a trade on selected coin
+/mytrades           ->   Provides current and closed trade information 
