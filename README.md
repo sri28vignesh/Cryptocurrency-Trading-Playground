@@ -18,3 +18,5 @@ A Telegram Bot provides a virtual playground to explore and do some mock trading
 `Tech Stack` -> Python + Telegram Bot API
 
 `Hosting` -> Heroku
+
+`Telegram Bot Link` -> ["https://t.me/Crypto_trading_plaground_bot"] Crypto-Trading-Playground
