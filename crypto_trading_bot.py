@@ -54,6 +54,7 @@ def send_available_cryptos(message):
 @bot.message_handler(commands=["add_watchlist"])
 def add_to_watchlist(message):
     '''receives a list of cryptos and adds to watchlist for the user'''
+    global watchlist_one, watchlist_two
     user_id = message.chat.id
     coin_names = cp.get_crypto_names()
     watchlist_one = bot.send_poll(user_id, question="Select the cryptocurrencies to add to your watchlist -Part 1", options= coin_names[:10], is_anonymous=False, allows_multiple_answers=True)
@@ -62,13 +63,22 @@ def add_to_watchlist(message):
 
 @bot.poll_answer_handler(func = lambda response:True)
 def receive_watchlist(response):
+    '''receives a list of cryptos from user's poll and adds to the user's watchlist'''
     coin_names = cp.get_crypto_names()
-    coin_names_one, coin_names_two = coin_names[:10], coin_names[10:] 
+    coin_names_one, coin_names_two = coin_names[:10], coin_names[10:]
+    # print(response.user) 
     if response.poll_id == watchlist_one.poll.id:
-        print(coin_names_one, response.user.chat.id, response.option_ids)
+        # print(coin_names_one, response.user.id, response.option_ids)
+        coin_names = pack_watchlist_names(coin_names_one, response.option_ids)
+        fdb.add_user_watchlist(response.user.id, coin_names)
     else:
-        print(coin_names_two, response.user.chat.id, response.option_ids)
+        # print(coin_names_two, response.user.id, response.option_ids)
+        coin_names = pack_watchlist_names(coin_names_two, response.option_ids)
+        fdb.add_user_watchlist(response.user.id, coin_names)
     # print(response.__dict__)
+
+def pack_watchlist_names(names, indices):
+    return [names[i] for i in indices]
 
 
 @bot.message_handler(commands=['watchlist'])
@@ -79,10 +89,70 @@ def send_watchlist(message):
     bot.reply_to(message, watchlist)
 
 
+@bot.message_handler(commands=['open_trade'])
+def disp_trade_coins(message):
+    '''sends the list of coins to open a trade'''
+    coin_names = "\n".join( [ f' {i+1}. {name}' for i,name in enumerate(cp.get_crypto_names()) ] )
+    coin_names = "\t Choose any coin to open a trade or buy:\n\n" + coin_names +"\n\n Enter ot{number} to select a coin, Eg: ot1 ->selects bitcoin."
+    bot.reply_to(message, coin_names)
+
+@bot.message_handler(regexp="^ot-(.)+-buy-(.)+")
+def get_opentrade_amt(message):
+    '''receives the amount and coin from the user to open a trade, format-> ot-BTC-buy-100 '''
+    trade_data = message.text.split("-")
+    userid = message.chat.id
+    _,symbol,_,amt = trade_data 
+    print( fdb.open_trade(userid, symbol, float(amt) ) )    
+    bot.reply_to(message, f"You have opened a buying trade of {symbol} for amount: ${amt}")
+
+
+@bot.message_handler(commands=['close_trade'])
+def disp_opened_trades(message):
+    '''sends the list of opened trade by the user to close'''
+    trades = fdb.get_opened_trades(message.chat.id)   
+    result = '''** Close a Trade ----- Select any opened trade listed below **\n\n'''
+    result = result + trades + '''\n
+    Enter `ct\"number\"` to close a particular trade\n
+    Eg: ct1 -> closes the trade number 1''' 
+    
+    if trades == "":
+        result = "Sorry, there is no trade to close!"
+    bot.reply_to(message, result)
+
+@bot.message_handler(regexp="^ct([1-9]|1[0-9]?|20)$")
+def get_closetrade_id(message):
+    '''receives trade id from user and closes the trade by selling the coin'''
+    userid = message.chat.id
+    trade_id = str(userid) +"-"+ message.text[2:]
+    result = fdb.close_trade(trade_id)   
+    bot.reply_to(message, "You have closed your selected trade!\n"+result)
+
+@bot.message_handler(regexp="^ot([1-9]|1[0-9]?|20)$" )
+def get_opentrade_coin(message):
+    '''receives coin to open a trade and messages which matches numbers between 1 and 20'''
+    coin_names = cp.get_crypto_names()
+    coin_num = int(message.text[2:])
+    result = cp.get_crypto_metrics(coin_names[coin_num-1])
+    bot.reply_to(message, result )
+
+@bot.message_handler(commands=["myassets"])
+def send_myassets(message):
+    '''sends the current cryptocurrency holdings of the user'''
+    userid = message.chat.id
+    trades = fdb.get_opened_trades(userid)
+    result = "    **MyAssets ----- List of current crypto holdings**   \n"
+    result += trades
+
+    if trades == "":
+        result = "Sorry, there is no assets to show!"
+    bot.reply_to(message, result )
+
 @bot.message_handler( func = lambda message:True )
 def echo_all(message):
     '''Sends back the received message from user'''
-    bot.send_message(message.chat.id, message.text )
+    markup = types.ReplyKeyboardRemove(selective=False)
+    bot.send_message(message.chat.id, "Sorry I could n't recognise this command, I'm still learning." , reply_markup=markup)
+
 
 
 

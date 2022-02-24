@@ -1,3 +1,4 @@
+from email.mime import base
 import requests
 import firebase_db as fdb
 
@@ -18,6 +19,28 @@ def get_crypto_names():
     crypto_data = requests.get(base_url, params={"fields": "id,slug,symbol,metrics/market_data/price_usd"}, headers= header_data).json()
     return [ coin["slug"] for coin in crypto_data["data"] ]
 
+def get_crypto_metrics(name):
+    coin = requests.get(base_url[:-1]+f'/{name}/metrics', headers=header_data ).json()["data"]
+    result = f'''** Open a Trade ---- Selected Cryptocurrency **\n\n
+                Name:  {name}\n
+                Symbol: {coin["symbol"]}\n
+                Price(USD): {coin["market_data"]["price_usd"]}\n
+                Last 24 Hrs Change(%): {coin["market_data"]["percent_change_usd_last_24_hours"]}\n\n
+                Please note: Min buy price is $100\n\n
+    Enter `ot-{coin['symbol']}-buy-priceamt` to open a trade on {name}\n
+    Eg: ot-{coin['symbol']}-buy-100
+              '''
+    return result
+
+def get_coin_info(name):
+    return requests.get(base_url[:-1]+f'/{name}/metrics', headers=header_data ).json()["data"]
+
+def get_coin_price(name):
+    return requests.get(f"https://data.messari.io/api/v1/assets/{name}/metrics", headers=header_data ).json()["data"]["market_data"]["price_usd"]
+
+def get_symbol_and_names():
+    crypto_data = requests.get(base_url, params={"fields": "id,slug,symbol,metrics/market_data/price_usd"}, headers= header_data).json()["data"]
+    return { coin["symbol"]:coin["slug"] for coin in crypto_data }
 
 def get_watchlist_info(uid):
     coin_names = fdb.get_user_watchlist(uid)
@@ -33,6 +56,7 @@ def get_watchlist_info(uid):
 
 if __name__ == "__main__":
     uid = 800528877
-    print(get_watchlist_info(uid))
+    # print(get_watchlist_info(uid))
     # print(get_crypto_names())
     # print(get_crypto_list())
+    print( get_symbol_and_names() )
