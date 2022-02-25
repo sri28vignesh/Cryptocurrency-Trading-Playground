@@ -4,6 +4,7 @@ import pyrebase
 import datetime
 import uuid
 import access_crypto_data as cp
+from tabulate import tabulate
 
 firebaseConfig = {
   "apiKey": "AIzaSyAAdaCTBZND0bGq4YUPFEiWtaWVkBDydVg",
@@ -102,13 +103,13 @@ def close_trade(tradeid):
 
 
 def disp_close_trade(trade_data):
-    result = f'''
+    result = f'''*
              Name: {trade_data["closedata"]["name"]}
-             Sold Units: {trade_data["closedata"]["units"]}
-             Total bought Amount: {trade_data["opendata"]["buy_amt"]}
-             Total sold Amount: {trade_data["closedata"]["sell_amt"]}   
-             Profit(%): {trade_data["profit_loss"]} 
-    '''
+             Sold Units: {format(trade_data["closedata"]["units"], ".3f")}
+             Total bought Amount: {format(trade_data["opendata"]["buy_amt"],".3f")}
+             Total sold Amount: {format(trade_data["closedata"]["sell_amt"],".3f")}   
+             Profit(%): {format(trade_data["profit_loss"],".3f")} 
+    *'''
     return result
 
 
@@ -149,21 +150,50 @@ def calc_profit(sell_price, buy_price):
 def get_opened_trades(userid):
     try:
         trades = db.child("trades").order_by_child('userid').equal_to(userid).get().val()
-        opened_trades = ""
+        opened_trades = []
         for i, trade in enumerate(trades.values()):
             if trade["status"] == "opened":
                 cur_price = cp.get_coin_price(trade["opendata"]["name"])
                 trade["opendata"]["profit"] = calc_profit(cur_price, trade["opendata"]["unit_price"])
 
-                opened_trades += f'''\n\t Trade: {i+1} \n
-                 Coin Name:  {trade["opendata"]["name"]}
-                 Units bought:   {trade["opendata"]["units"]}   
-                 Bought Unit Price(USD):  {trade["opendata"]["unit_price"]}    
-                 Profit(%):  {trade["opendata"]["profit"]}\n'''
-        return opened_trades
+                opened_trades.append( [ i+1, trade["opendata"]["name"],
+                                        trade["opendata"]["units"], trade["opendata"]["unit_price"],   
+                                        trade["opendata"]["profit"] ])
+
+        opened_trades = tabulate(opened_trades, floatfmt=".3f",headers=["Trade No.", "Coin Name", "Units bought", "Bought Unit Price(USD)", "Profit(%)"])
+
+
+        return f'```{opened_trades}```'
     except:
         return False
 
+def get_closed_trades(userid):
+    try:
+        trades = db.child("trades").order_by_child('userid').equal_to(userid).get().val()
+        closed_trades = []
+        for i, trade in enumerate(trades.values()):
+            if trade["status"] == "closed":
+                # cur_price = cp.get_coin_price(trade["closedata"]["name"])
+                # trade["closedata"]["profit"] = calc_profit(cur_price, trade["opendata"]["unit_price"])
+
+                closed_trades.append( [ i+1, trade["closedata"]["name"],
+                                        trade["closedata"]["units"], trade["closedata"]["unit_price"],   
+                                        trade["closedata"]["sell_amt"] ])
+
+        closed_trades = tabulate(closed_trades, floatfmt=".3f",headers=["Trade No.", "Coin Name", "Units Sold", "Sold Unit Price(USD)", "Sold Amount(USD)"])
+
+
+        return f'```{closed_trades}```'
+    except:
+        return False
+
+
+def get_all_trades(userid):
+    opened = get_opened_trades(userid)
+    closed = get_closed_trades(userid)
+
+    result = "\n\n*List of opened trades*\n\n" + opened + "\n\n*List of closed trades*\n\n" + closed
+    return result
 
 def update_wallet(userid,amt):
     try:
