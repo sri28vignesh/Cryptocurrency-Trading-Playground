@@ -4,8 +4,9 @@ from telebot import types, util
 import firebase_db as fdb 
 import access_crypto_data as cp
 from tabulate import tabulate
+from decouple import config
 
-TOKEN = open("secret-token").read()
+TOKEN = config.telebot_api_key(default='')
 bot = telebot.TeleBot(TOKEN)
 watchlist_one, watchlist_two = None, None
 

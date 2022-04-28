@@ -2,8 +2,9 @@ from email.mime import base
 import requests
 import firebase_db as fdb
 from tabulate import tabulate
+from decouple import config
 
-header_data = {"x-messari-api-key" : "1945b43f-0adb-485d-b9bc-2c294871e0bb"}
+header_data = {"x-messari-api-key" : config.crypto_api_key(default = '')}
 base_url = "https://data.messari.io/api/v1/assets?"
 
 def get_crypto_list():

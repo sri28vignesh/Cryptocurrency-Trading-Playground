@@ -1,3 +1,4 @@
+from email.policy import default
 from re import I
 from turtle import update
 import pyrebase
@@ -5,16 +6,17 @@ import datetime
 import uuid
 import access_crypto_data as cp
 from tabulate import tabulate
+from decouple import config
 
 firebaseConfig = {
-  "apiKey": "AIzaSyAAdaCTBZND0bGq4YUPFEiWtaWVkBDydVg",
-  "authDomain": "crypto-trading-playground.firebaseapp.com",
-  "databaseURL": "https://crypto-trading-playground-default-rtdb.asia-southeast1.firebasedatabase.app",
-  "projectId": "crypto-trading-playground",
-  "storageBucket": "crypto-trading-playground.appspot.com",
-  "messagingSenderId": "229453374449",
-  "appId": "1:229453374449:web:eafb59479243306d56da50",
-  "measurementId": "G-48XKP0LE1E"
+  "apiKey": config.db_apiKey(default=''),
+  "authDomain": config.db_authDomain(default=''),
+  "databaseURL": config.db_databaseURL(default=''),
+  "projectId": config.db_projectID(default=''),
+  "storageBucket": config.db_storageBucket(default=''),
+  "messagingSenderId": config.db_messagingSenderId(default=''),
+  "appId": config.db_appId(default = ''),
+  "measurementId": config.db_measurementId(default='')
 }
 
 firebase = pyrebase.initialize_app(firebaseConfig)
